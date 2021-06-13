@@ -1,0 +1,182 @@
+-Running inside browsers is an engine called V8 engine.
+-V8 engine is written in C++ by Google and it compiles JS into machine code at runtime.
+-BY passing JS code through V8 engine in the browser, the computer can understand JS 
+within the context of that browser.
+-However, it V8 cannot run JS outside of the browser bc there is no V8 engine. That is 
+where node comes into play.
+-Node JS is also written is C++ and that WRAPS THE V8 ENGINE so this v8 engine that's in
+the browser also lives inside node.
+- JS -> Node (it has V8 compiler inside of it) -> machine code
+-We can now run JS directly on a computer or server and not just in the browser 
+
+-Node is more than just a WRAPPER for the v8 engine
+    -read & write files on a computer 
+    -connect to db 
+    -act as a server for content 
+-JS was originally made for the browser to add INTERACTIVITY, but now there's more to it.
+
+The role of NOde.js 
+    -run JS on the backend (server side)
+    -handling requests from browser and give a response in the form of (HTML,css,image...)
+    -communicate with db 
+
+-Alternative to server-side languages like Python,Ruby,PHP
+    -Advantages over other languages:
+        -No need to learn an extra language for server 
+        -Can share code between front and back end 
+        -Massive community 
+        -Huge amount of 3rd party packages/tools 
+
+In node, it's the global object instead of the window object 
+(eg: setTimeout (dont have to explicitly type window.setTimeout))
+
+------------------------------------------------------------------------------------------
+File system 
+
+const fs = require('fs')  <-- One of Node's core modules
+
+    -__dirname
+    -__filename
+    -read/write/deleting files
+    -directories (eg: fs.mkdir())
+
+Streams & Buffer
+-these methods/approaches above work pretty well for small files. If reading/writing from a 
+larger files, it's better to use STREAMS.
+-Streams -> start using data before it has finished loading. Basically using part of the 
+data that has arrived at that moment instead of waiting for the whole piece.
+-We could pass the data a bit at a time through a stream and this way, small chunks 
+of data are packaged up into what's known as a BUFFER and then sent down the stream every 
+time the buffer fills. (Same concept as streaming in Netflix, start watching without
+having to wait for the whole video to load initially)
+
+    const readStream = fs.createReadStream('./docs/blog.txt)
+    const writeStream = fs.createWriteStream(./docs/blogw.txt)
+
+    readStream.on('data',(chunk)=>{
+        //an event listener for that every time we receive a buffer of data from the stream 
+        console.log(chunk.toString()); //.toString() to convert the buffer to actual data (string)
+        writeStream.write(chunk.toString());
+    })
+
+    (another simpler syntax)
+    readStream.pipe(writeStream);
+------------------------------------------------------------------------------------------
+Client & Server (Requests & Responses)
+
+(view server.js for simple server setup using the 'http' CORE module)
+
+Response Status Codes: 
+    100 range - informational responses 
+    200 range - sucess codes 
+    300 range - codes for redirects 
+    400 range - user or client error codes 
+    500 range - server error codes
+
+eg-> 404 (resource doesnt exist)
+
+lodash package -> Math operation/Lodash makes JavaScript easier by taking the hassle out of working with arrays, numbers, objects, strings, etc.
+------------------------------------------------------------------------------------------
+Express.JS
+
+-framework for node that helps us to easily create node websites
+-alternative to the http core module 
+-clean code, readable 
+
+(view app.js)
+------------------------------------------------------------------------------------------
+View Engines 
+
+-Alternative to HTML files, whereby we can inject DYNAMIC data and content into our different
+templates 
+-Bc atm, we're serving static HTML files (predefined & doesnt change)
+-View engine lets us write HTML templates & allows us to inject dynamic content 
+-npm i ejs
+-automatically, express is gonna look in the views folder for ejs templates (by default)
+
+-ejs templates are processed throught the EJS view engine on the server 
+-Our view files live on te server and when we wanna render 1 through the browser, the 
+view file is PASSED INTO THE VIEW ENGINE (ejs view engine) to be processed
+-The engine looks for any kind of dynamic content/variables/loops/conditions and it 
+figures out the resulting HTML code for those parts and SPITS OUT A VALID HTML PAGE 
+-This whole process is called -> SERVER SIDE RENDERING 
+
+Partials 
+-aka partial template
+-There r parts of a template that can be reused in different views 
+------------------------------------------------------------------------------------------
+Middleware 
+
+-Code(function) which runs (on the server) between getting a request and sending a response
+-eg: .get() & .use()
+-middleware runs from top to bottom in our code, it runs that way until we exit the process 
+or EXPLICIT SEND A RESPONSE to the browser
+-using next()
+-3rd party middlewares (eg: helmet -> security middleware)
+-npm install morgan -> basically a logger 
+-there r middlewares that comes ship with express (eg: to serve static files like css)
+
+Static files (IMPORTANT!)
+-(11:34) -> https://www.youtube.com/watch?v=_GJKAs7A0_4&list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&index=8
+-By default, if we add some static files like css/images, then we wouldnt be able to auto 
+access that file from FRONT END/BROWSER
+-Eg: create a styles.css file in the root folder, go to the browser and type "localhost:3000/styles.css",
+it wouldnt work. Even if we place a link to the styles.css file in our EJS template, 
+eg: <link href="/styles.css">, it wouldnt just REFERENCE THAT FROM THE BROWSER.
+-The server protects all of our files auto from users in the browser so they cant 
+just access any of our files whenever they want to 
+-To allow the browser access to smth, we have to specify WHAT FILES SHOULD BE ALLOWED 
+TO BE ACCESSED/PUBLIC 
+-To do tht -> static middleware (comes with express)
+
+------------------------------------------------------------------------------------------
+MongoDb
+
+setup -> https://www.youtube.com/watch?v=bxsemcrY4gQ
+
+Types of setups:
+- Use MongoDB in our computer locally and use & then deploy that
+OR
+- Use a cloud database which is already hosted for us and it can be quite a lot easier 
+for us to manage (MongoDB atlas - cloud service)
+
+database cluster is a collection of databases that is managed by a single instance of a 
+running database server
+
+To connect to the database:
+- We could connect using the plain MongoDB API package & we could use the regular 
+MongoDB API to make queries to the db 
+OR 
+-use Mongoose to connect and interact with the database (npm i mongoose)
+
+Mongoose is an ODM library - Object Document Mapping library 
+
+It wraps the standard MongoDB API and it provides us with a much easier way to connect to 
+and communicate w the database.
+It does this by allowing us to create simple DATA MODELS which have database query methods 
+to create/get/delete/update data based documents. Under the hood, mongoose does the 
+heavy lifting for us, it queriesthe correct db collection for us based on the name of 
+the model we use and then it performs the action required and returns to use a response.
+
+Eg: User.get(),User.findById() / Blog.deleteOne()
+
+The way we generally wrk with MongoDB and Mongoose is to create schemas and models. We 
+make model to reresent the data resource.
+-Schema defines the structure of a type of data/document 
+    -properties & property type 
+-Models allow us to communicate with database collections 
+(View BlogModel.png)
+
+ajax req?
+------------------------------------------------------------------------------------------
+MVC Basics 
+
+-Model,View,Controller
+-A way of structuring our code & files 
+-Keeps code more modular, reusable & easier to read
+
+-Views (our html templates)
+-Models (how we describe our data structure & use that to interact with db)
+-Controllers (forms the link between our models & views)
+    -theyre like a middleman that use models to get data and then pass that into the view 
+------------------------------------------------------------------------------------------

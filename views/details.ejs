@@ -1,0 +1,35 @@
+<html lang="en">
+<%- include("./partials/head.ejs") %>
+
+<body>
+  <%- include("./partials/nav.ejs") %>
+
+  <div class="details content">
+    <h2><%= blog.title %></h2>
+    <div class="content">
+      <p><%= blog.body %></p>
+    </div>
+    <a class="delete" data-doc="<%= blog._id %>">
+      <img src="/trashcan.svg" alt="delete icon">
+    </a>
+  </div>
+
+  <%- include("./partials/footer.ejs") %>
+
+  <script>
+    //any script tag will be run IN THE BROWSER, NOT SERVER 
+    const trashcan = document.querySelector('a.delete');
+
+    trashcan.addEventListener('click',(e)=>{
+        const endpoint = `/blogs/${trashcan.dataset.doc}`;
+        //fetch api
+        //basically sends out a req from the JS to this endpoint
+        fetch(endpoint,{
+            method:'DELETE'
+        }).then((response)=>response.json()) //parses this json data to an actual JS object
+        .then((data)=>window.location.href = data.redirect) //redirect in front end
+        .catch(err=>console.log(err))
+    })
+  </script>
+</body>
+</html>
